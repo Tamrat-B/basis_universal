@@ -1450,7 +1450,16 @@ namespace basisu
 		const uint8_vec& comp_data = m_params.m_create_ktx2_file ? m_output_ktx2_file : m_basis_file.get_compressed_data();
 		if (m_params.m_write_output_basis_files)
 		{
-			const std::string& output_filename = m_params.m_out_filename;
+			std::string output_filename;
+			std::string inputfilepath;
+			if (!string_get_pathname(m_params.m_out_filename.c_str(), inputfilepath) || inputfilepath.empty()) //no output folder provided. Using input file source folder for output. Useful when needing to output relative to multiple input sources
+			{
+				inputfilepath.clear();
+				string_get_pathname(m_params.m_source_filenames[0].c_str(), inputfilepath);
+				string_combine_path(output_filename, inputfilepath.c_str(), m_params.m_out_filename.c_str());
+			}
+			else
+				output_filename = m_params.m_out_filename;
 
 			if (!write_vec_to_file(output_filename.c_str(), comp_data))
 			{
